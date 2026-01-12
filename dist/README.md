@@ -9,6 +9,8 @@ dist/
   assertions.json         # assertions array (verbatim)
   assertions_by_person.json  # person id -> assertion ids (subject + object)
   assertions_by_id.json   # assertion id -> assertion object (verbatim)
+  assertions_by_layer.json  # layer id -> assertion ids
+  assertions_by_person_by_layer.json  # person id -> layer id -> assertion ids
 ```
 
 Notes:
@@ -24,4 +26,8 @@ Notes:
   keyed by person id and populated from both subject and object endpoints.
 - `assertions_by_id.json` is an adjacency index for O(1) lookup of assertions by id, reusing the
   same normalized assertion shape as `assertions.json`.
+- `assertions_by_layer.json` indexes assertion IDs by narrative layer, defaulting to `canon` when
+  the `extensions.psellos.layer` field is missing.
+- `assertions_by_person_by_layer.json` indexes assertion IDs by person and layer, combining subject
+  and object endpoints, and defaulting to `canon` when the `extensions.psellos.layer` field is missing.
 - Adjacency indices are rebuilt on every run and are authoritative for downstream consumers.
