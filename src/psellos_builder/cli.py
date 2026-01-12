@@ -12,8 +12,8 @@ def build_parser() -> argparse.ArgumentParser:
         prog="psellos-builder",
         description="Validate and compile prosopographical datasets into static JSON artifacts.",
     )
-    parser.add_argument("input", type=Path, help="Path to raw dataset directory.")
-    parser.add_argument("--spec", type=Path, required=True, help="Path to psellos-spec v0.1 directory.")
+    parser.add_argument("input", type=Path, help="Path to raw dataset JSON file.")
+    parser.add_argument("--spec", type=Path, required=True, help="Path to psellos-spec v0.1.0 schema.")
     parser.add_argument(
         "--dist",
         type=Path,
