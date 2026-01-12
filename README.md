@@ -31,7 +31,7 @@ psellos-builder is one component in the broader psellos ecosystem, with coordina
 
 ### Outputs
 
-- **Manifest:** `dist/manifest.json` containing the spec version, counts (persons and assertions), and a person index (id → name).
+- **Manifest:** `dist/manifest.json` containing the spec version, builder version, optional build timestamp (`PSELLOS_BUILD_TIMESTAMP`), counts (persons and assertions), and a person index (id → name).
 - **Layer artifacts:** layer indexes, metadata, and stats emitted to `dist/` (see `dist/README.md`).
 
 ### Non-goals
