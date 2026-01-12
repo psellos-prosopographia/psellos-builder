@@ -1,20 +1,13 @@
 # dist output structure
 
-Compiled artifacts in `dist/` are static JSON designed for psellos-web consumption.
+Compiled artifacts in `dist/` are static JSON designed for downstream consumption.
 
 ```
 dist/
-  assertions/
-    core.json            # filtered assertions for the core narrative layer
-  indexes/
-    by-person.json       # map of person-id -> list of assertion ids
-    by-place.json        # map of place-id -> list of assertion ids
-    by-relation.json     # map of relation-id -> list of assertion ids
-  meta.json              # build metadata (version, timestamps, provenance)
+  manifest.json           # spec version, counts, and person index
 ```
 
 Notes:
 
-- File names are stable to keep psellos-web integration simple.
-- Additional narrative layers can be added as sibling files under `assertions/`.
-- Metadata should include the psellos-spec version used for validation.
+- File names are stable to keep consumer integration simple.
+- `manifest.json` includes `spec_version`, `counts`, and `person_index` (person id → name).

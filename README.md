@@ -4,7 +4,7 @@ Build pipeline and CLI for validating and compiling prosopographical datasets in
 
 ## Overview
 
-psellos-builder treats **psellos-spec v0.1.x** as an immutable source of truth and produces derived artifacts only. It does not provide UI, visualization, or authoring features.
+psellos-builder treats **psellos-spec v0.1.0** as an immutable source of truth and produces derived artifacts only. It does not provide UI, visualization, or authoring features. Targets psellos-spec v0.1.0.
 
 ## Project context
 
@@ -12,15 +12,12 @@ psellos-builder is one component in the broader psellos ecosystem, with coordina
 
 ### Inputs
 
-- **Spec:** psellos-spec v0.1.x (immutable), provided as a directory path.
-- **Raw data:** a dataset directory containing source JSON (or compatible) files that follow the spec.
-- **Expected directories:** the builder expects a spec directory and a dataset root (with raw data files under that root).
+- **Spec:** psellos-spec v0.1.0 (immutable), provided as either a JSON Schema file or a directory containing `schema.json`.
+- **Raw data:** a single dataset JSON file that follows the spec.
 
 ### Outputs
 
-- **Compiled assertions:** filtered assertions aligned to the desired narrative layer(s).
-- **Indexes:** static JSON indexes that power browsing and lookups in psellos-web.
-- **Dist layout:** a consistent `/dist/` tree with JSON artifacts (documented in `dist/README.md`), including `assertions/`, `indexes/`, and `meta.json` at a high level.
+- **Manifest:** `dist/manifest.json` containing the spec version, counts (persons and assertions), and a person index (id → name).
 
 ### Non-goals
 
@@ -36,12 +33,11 @@ src/psellos_builder/
   cli.py                 # CLI entry point
   builders/
     compile.py            # Pipeline orchestration
-    indexes.py            # Index generation (stub)
+    manifest.py           # Manifest generation
   validators/
-    schema.py             # Schema validation (stub)
-    assertions.py         # Narrative-layer filtering (stub)
+    schema.py             # Schema validation
   exporters/
-    dist_writer.py        # Dist serialization (stub)
+    dist_writer.py        # Dist serialization
 ```
 
 Validators, builders, and exporters are intentionally separate to keep contracts explicit.
@@ -49,17 +45,15 @@ Validators, builders, and exporters are intentionally separate to keep contracts
 ## CLI
 
 ```bash
-python -m psellos_builder.cli --spec /path/to/psellos-spec /path/to/dataset
+python -m psellos_builder.cli --spec /path/to/psellos-spec/schema.json /path/to/dataset.json
 ```
 
-The CLI currently orchestrates a stubbed pipeline for validation, filtering, index creation, and dist output.
+The CLI validates the dataset against psellos-spec v0.1.0 and writes a deterministic manifest to `dist/`.
 
 ## Pipeline flow
 
-1. **Schema validation** ensures the raw dataset matches psellos-spec v0.1.x.
-2. **Assertion filtering** selects assertions by narrative layer (e.g., `core`).
-3. **Index generation** creates lookup maps for person, place, and relation.
-4. **Dist export** writes static JSON artifacts to `/dist/`.
+1. **Schema validation** ensures the raw dataset matches psellos-spec v0.1.0.
+2. **Manifest generation** emits a deterministic summary of persons and assertions.
 
 ## Output structure
 
