@@ -23,6 +23,33 @@ def _normalize_assertion(assertion: dict[str, Any]) -> dict[str, Any]:
     return normalized
 
 
+def _add_to_index(
+    index: dict[str, set[str]], person_id: str, assertion_id: str
+) -> None:
+    index.setdefault(person_id, set()).add(assertion_id)
+
+
+def _build_assertion_indexes(
+    assertions: list[dict[str, Any]]
+) -> tuple[dict[str, list[str]], dict[str, dict[str, Any]]]:
+    assertions_by_person: dict[str, set[str]] = {}
+    assertions_by_id: dict[str, dict[str, Any]] = {}
+    for assertion in assertions:
+        assertion_id = assertion.get("id")
+        if not isinstance(assertion_id, str):
+            continue
+        assertions_by_id[assertion_id] = assertion
+        if "subject" in assertion:
+            _add_to_index(assertions_by_person, assertion["subject"], assertion_id)
+        if "object" in assertion:
+            _add_to_index(assertions_by_person, assertion["object"], assertion_id)
+    sorted_by_person = {
+        person_id: sorted(assertion_ids)
+        for person_id, assertion_ids in assertions_by_person.items()
+    }
+    return sorted_by_person, assertions_by_id
+
+
 def write_dist(
     *, dist_path: Path, manifest: dict[str, Any], dataset: dict[str, Any]
 ) -> None:
@@ -51,4 +78,18 @@ def write_dist(
             _normalize_assertion(assertion) for assertion in assertions
         ]
         json.dump(normalized_assertions, handle, sort_keys=True, indent=2)
+        handle.write("\n")
+
+    assertions_by_person, assertions_by_id = _build_assertion_indexes(
+        normalized_assertions
+    )
+
+    assertions_by_person_path = dist_path / "assertions_by_person.json"
+    with assertions_by_person_path.open("w", encoding="utf-8") as handle:
+        json.dump(assertions_by_person, handle, sort_keys=True, indent=2)
+        handle.write("\n")
+
+    assertions_by_id_path = dist_path / "assertions_by_id.json"
+    with assertions_by_id_path.open("w", encoding="utf-8") as handle:
+        json.dump(assertions_by_id, handle, sort_keys=True, indent=2)
         handle.write("\n")

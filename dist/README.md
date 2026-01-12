@@ -7,6 +7,8 @@ dist/
   manifest.json           # spec version, counts, and person index
   persons.json            # person id -> person object (verbatim)
   assertions.json         # assertions array (verbatim)
+  assertions_by_person.json  # person id -> assertion ids (subject + object)
+  assertions_by_id.json   # assertion id -> assertion object (verbatim)
 ```
 
 Notes:
@@ -18,3 +20,8 @@ Notes:
   from the input dataset (no enrichment).
 - `assertions.json` is the validated assertions array from the input dataset (no enrichment).
 - `assertions.json` uses flat endpoint IDs; person labels are resolved via persons.json.
+- `assertions_by_person.json` is an adjacency index for O(1) lookup of assertions for a person,
+  keyed by person id and populated from both subject and object endpoints.
+- `assertions_by_id.json` is an adjacency index for O(1) lookup of assertions by id, reusing the
+  same normalized assertion shape as `assertions.json`.
+- Adjacency indices are rebuilt on every run and are authoritative for downstream consumers.
