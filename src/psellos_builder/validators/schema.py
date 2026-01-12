@@ -5,6 +5,7 @@ import importlib.util
 import json
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 SPEC_VERSION = "v0.1.0"
 
@@ -57,17 +58,30 @@ def load_dataset(input_path: Path) -> dict[str, Any]:
     return data
 
 
-def load_schema(spec_path: Path) -> dict[str, Any]:
+def load_schema(spec_path: Path) -> tuple[dict[str, Any], Path | None]:
     """Load a JSON schema from the spec directory or file, if present."""
     if spec_path.is_file():
         with spec_path.open("r", encoding="utf-8") as handle:
-            return json.load(handle)
+            return json.load(handle), spec_path.parent
     if spec_path.is_dir():
         candidate = spec_path / "schema.json"
         if candidate.exists():
             with candidate.open("r", encoding="utf-8") as handle:
-                return json.load(handle)
-    return MINIMAL_SCHEMA
+                return json.load(handle), spec_path
+    return MINIMAL_SCHEMA, None
+
+
+def _schema_path_for_uri(uri: str, schema_dir: Path) -> Path | None:
+    base_uri = uri.split("#", 1)[0]
+    if not base_uri:
+        return None
+    if base_uri.startswith("https://psellos.org/spec/schema/"):
+        filename = base_uri.rsplit("/", 1)[-1]
+        return schema_dir / filename
+    parsed = urlparse(base_uri)
+    if not parsed.scheme and base_uri.endswith(".json"):
+        return schema_dir / base_uri
+    return None
 
 
 def _format_error_path(error_path: Any) -> str:
@@ -109,15 +123,35 @@ def validate_schema(*, spec_path: Path, input_path: Path) -> dict[str, Any]:
         raise FileNotFoundError(f"Spec path not found: {spec_path}")
 
     data = load_dataset(input_path)
-    schema = load_schema(spec_path)
+    schema, schema_dir = load_schema(spec_path)
 
     if importlib.util.find_spec("jsonschema") is None:
         _manual_validate(data)
         return data
 
     from jsonschema import Draft202012Validator
+    from referencing import Registry, Resource
 
-    validator = Draft202012Validator(schema)
+    if schema_dir is not None:
+        def retrieve(uri: str) -> Resource:
+            candidate = _schema_path_for_uri(uri, schema_dir)
+            if candidate is None:
+                raise ValueError(f"Unsupported schema reference: {uri}")
+            if not candidate.exists():
+                if candidate.name == "core.snap.v0.1.json":
+                    raise FileNotFoundError(
+                        "Missing referenced schema core.snap.v0.1.json at "
+                        f"{candidate}"
+                    )
+                raise FileNotFoundError(f"Referenced schema not found: {candidate}")
+            with candidate.open("r", encoding="utf-8") as handle:
+                contents = json.load(handle)
+            return Resource.from_contents(contents)
+
+        registry = Registry(retrieve=retrieve)
+        validator = Draft202012Validator(schema, registry=registry)
+    else:
+        validator = Draft202012Validator(schema)
     error = next(validator.iter_errors(data), None)
     if error is not None:
         location = _format_error_path(error.path)

@@ -24,7 +24,8 @@ psellos-builder is one component in the broader psellos ecosystem, with coordina
 
 ### Inputs
 
-- **Spec:** psellos-spec v0.1.0 (immutable), provided as either a JSON Schema file or a directory containing `schema.json`.
+- **Spec:** psellos-spec v0.1.0 (immutable), provided as a JSON Schema file.
+- **Schema references:** referenced schema files must be colocated in the same directory as the schema file. The builder resolves `https://psellos.org/spec/schema/*` URIs from disk.
 - **Raw data:** a single dataset JSON file that follows the spec.
 
 ### Outputs
@@ -60,7 +61,7 @@ Validators, builders, and exporters are intentionally separate to keep contracts
 python -m psellos_builder.cli --spec /path/to/psellos-spec/schema.json /path/to/dataset.json
 ```
 
-The CLI validates the dataset against psellos-spec v0.1.0 and writes a deterministic manifest to `dist/`.
+The CLI validates the dataset against psellos-spec v0.1.0, resolving `https://psellos.org/spec/schema/*` references locally from the schema directory, and writes a deterministic manifest to `dist/`.
 
 ## Pipeline flow
 
