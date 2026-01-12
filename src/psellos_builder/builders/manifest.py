@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any
 
@@ -37,14 +38,19 @@ def _resolve_builder_version() -> str:
         return "unknown"
 
 
-def _resolve_build_timestamp() -> str | None:
+DEFAULT_BUILD_TIMESTAMP = "1970-01-01T00:00:00Z"
+
+
+def _resolve_build_timestamp() -> str:
     value = os.environ.get("PSELLOS_BUILD_TIMESTAMP")
     if isinstance(value, str) and value.strip():
         return value
-    return None
+    return DEFAULT_BUILD_TIMESTAMP
 
 
-def build_manifest(dataset: dict[str, Any]) -> dict[str, Any]:
+def build_manifest(
+    dataset: dict[str, Any], *, spec_path: Path, input_path: Path
+) -> dict[str, Any]:
     """Build the deterministic manifest JSON payload."""
     persons = dataset.get("persons", [])
     assertions = dataset.get("assertions", [])
@@ -57,15 +63,17 @@ def build_manifest(dataset: dict[str, Any]) -> dict[str, Any]:
         person_index[person_id] = _resolve_person_display_name(person, person_id)
 
     manifest = {
-        "spec_version": SPEC_VERSION,
+        "spec": {
+            "identifier": spec_path.as_posix(),
+            "version": SPEC_VERSION,
+        },
         "builder_version": _resolve_builder_version(),
+        "build_timestamp": _resolve_build_timestamp(),
+        "dataset_path": input_path.as_posix(),
         "counts": {
             "persons": len(persons),
             "assertions": len(assertions),
         },
         "person_index": person_index,
     }
-    build_timestamp = _resolve_build_timestamp()
-    if build_timestamp is not None:
-        manifest["build_timestamp"] = build_timestamp
     return manifest

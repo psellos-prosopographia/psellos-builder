@@ -4,7 +4,7 @@ Compiled artifacts in `dist/` are static JSON designed for downstream consumptio
 
 ```
 dist/
-  manifest.json           # spec version, builder version, optional build timestamp, counts, and person index
+  manifest.json           # spec identifier/version, builder version, build timestamp, dataset path, counts, and person index
   persons.json            # person id -> person object (verbatim)
   assertions.json         # assertions array (verbatim)
   assertions_by_person.json  # person id -> assertion ids (subject + object)
@@ -22,8 +22,10 @@ Notes:
 - Export flows can be implemented as client-side joins across these artifacts
   (for example, using `layers.json`, `assertions_by_layer.json`, and
   `assertions_by_id.json` together).
-- `manifest.json` includes `spec_version`, `builder_version`, `counts`, and `person_index`
-  (person id → name). If `PSELLOS_BUILD_TIMESTAMP` is set, it also includes `build_timestamp`.
+- `manifest.json` includes `spec.identifier`, `spec.version`, `builder_version`,
+  `build_timestamp`, `dataset_path`, `counts`, and `person_index` (person id → name).
+  `build_timestamp` comes from `PSELLOS_BUILD_TIMESTAMP`, defaulting to
+  `1970-01-01T00:00:00Z` when unset.
 - Manifest person index uses best-effort display name resolution (name/label/names/id).
 - `persons.json` is an object keyed by person id containing the validated person objects
   from the input dataset (no enrichment).
