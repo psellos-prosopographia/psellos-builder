@@ -74,6 +74,17 @@ python -m psellos_builder.qa --spec ../psellos-spec/schema.json ../psellos-data/
 The QA check runs the build pipeline and verifies `assertions_by_layer.json` (and, if present,
 `layers.json`) for deterministic sorting and correct layer assignment.
 
+## Smoke test
+
+Run the deterministic smoke test for layer artifacts against the fixture dataset (or any dataset):
+
+```bash
+psellos-builder-smoke --spec ../psellos-spec/schema.json ../psellos-data/fixture.json
+```
+
+The smoke test runs the build pipeline and validates the presence and ordering of
+`assertions_by_layer.json` and `layers.json`.
+
 ## Pipeline flow
 
 1. **Schema validation** ensures the raw dataset matches psellos-spec v0.1.0.
