@@ -1,0 +1,12 @@
+{
+  "person-1": {
+    "entity_type": "person",
+    "id": "person-1",
+    "label": "Person One"
+  },
+  "person-2": {
+    "entity_type": "person",
+    "id": "person-2",
+    "label": "Person Two"
+  }
+}

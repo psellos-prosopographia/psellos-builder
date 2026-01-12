@@ -1,0 +1,18 @@
+{
+  "person-1": {
+    "canon": [
+      "assertion-1"
+    ],
+    "faction_a": [
+      "assertion-2"
+    ]
+  },
+  "person-2": {
+    "canon": [
+      "assertion-1"
+    ],
+    "faction_a": [
+      "assertion-2"
+    ]
+  }
+}

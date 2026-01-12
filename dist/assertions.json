@@ -1,0 +1,24 @@
+[
+  {
+    "extensions": {
+      "psellos": {
+        "layer": "canon"
+      }
+    },
+    "id": "assertion-1",
+    "object": "person-2",
+    "predicate": "parent_of",
+    "subject": "person-1"
+  },
+  {
+    "extensions": {
+      "psellos": {
+        "layer": "faction_a"
+      }
+    },
+    "id": "assertion-2",
+    "object": "person-1",
+    "predicate": "parent_of",
+    "subject": "person-2"
+  }
+]

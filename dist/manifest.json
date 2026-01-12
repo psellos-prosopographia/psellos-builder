@@ -1,0 +1,11 @@
+{
+  "counts": {
+    "assertions": 2,
+    "persons": 2
+  },
+  "person_index": {
+    "person-1": "Person One",
+    "person-2": "Person Two"
+  },
+  "spec_version": "v0.1.0"
+}
