@@ -1,6 +1,8 @@
 """Manifest generation for compiled datasets."""
 from __future__ import annotations
 
+import os
+from importlib.metadata import PackageNotFoundError, version
 from typing import Any
 
 from psellos_builder.validators.schema import SPEC_VERSION
@@ -28,6 +30,20 @@ def _resolve_person_display_name(person: dict[str, Any], person_id: str) -> str:
     return person_id
 
 
+def _resolve_builder_version() -> str:
+    try:
+        return version("psellos-builder")
+    except PackageNotFoundError:
+        return "unknown"
+
+
+def _resolve_build_timestamp() -> str | None:
+    value = os.environ.get("PSELLOS_BUILD_TIMESTAMP")
+    if isinstance(value, str) and value.strip():
+        return value
+    return None
+
+
 def build_manifest(dataset: dict[str, Any]) -> dict[str, Any]:
     """Build the deterministic manifest JSON payload."""
     persons = dataset.get("persons", [])
@@ -40,11 +56,16 @@ def build_manifest(dataset: dict[str, Any]) -> dict[str, Any]:
             raise ValueError(f"Duplicate person id detected: {person_id}")
         person_index[person_id] = _resolve_person_display_name(person, person_id)
 
-    return {
+    manifest = {
         "spec_version": SPEC_VERSION,
+        "builder_version": _resolve_builder_version(),
         "counts": {
             "persons": len(persons),
             "assertions": len(assertions),
         },
         "person_index": person_index,
     }
+    build_timestamp = _resolve_build_timestamp()
+    if build_timestamp is not None:
+        manifest["build_timestamp"] = build_timestamp
+    return manifest
