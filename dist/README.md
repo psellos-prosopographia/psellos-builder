@@ -12,6 +12,8 @@ dist/
   assertions_by_layer.json  # layer id -> assertion ids
   assertions_by_person_by_layer.json  # person id -> layer id -> assertion ids
   layers.json             # layer ids (sorted)
+  layers_meta.json        # optional layer metadata (sorted by order/id)
+  layer_stats.json        # layer diagnostics + statistics
 ```
 
 Notes:
@@ -36,4 +38,9 @@ Notes:
   and object endpoints, and defaulting to `canon` when the `extensions.psellos.layer` field is missing.
 - `layers.json` lists available narrative layers, derived from `assertions_by_layer.json` keys
   (including `canon` only when present in assertions).
+- `layers_meta.json` is emitted when a `layers_meta.source.json` file is present alongside the
+  dataset input; it contains curated layer metadata sorted by `order` then `id`.
+- `layer_stats.json` contains deterministic diagnostics, including assertion/person counts by
+  layer, relationship type distributions (missing rels counted as `(none)`), top persons by layer,
+  and optional canon comparisons.
 - Adjacency indices are rebuilt on every run and are authoritative for downstream consumers.

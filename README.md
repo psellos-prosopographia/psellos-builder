@@ -27,10 +27,12 @@ psellos-builder is one component in the broader psellos ecosystem, with coordina
 - **Spec:** psellos-spec v0.1.0 (immutable), provided as a JSON Schema file.
 - **Schema references:** referenced schema files must be colocated in the same directory as the schema file. The builder resolves `https://psellos.org/spec/schema/*` URIs from disk.
 - **Raw data:** a single dataset JSON file that follows the spec.
+- **Optional layer metadata:** `layers_meta.source.json` placed alongside the dataset input file.
 
 ### Outputs
 
 - **Manifest:** `dist/manifest.json` containing the spec version, counts (persons and assertions), and a person index (id → name).
+- **Layer artifacts:** layer indexes, metadata, and stats emitted to `dist/` (see `dist/README.md`).
 
 ### Non-goals
 

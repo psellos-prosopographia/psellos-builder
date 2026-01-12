@@ -170,7 +170,12 @@ def _validate_assertions_by_id(
 def run_check(*, input_path: Path, spec_path: Path, dist_path: Path) -> None:
     dataset = validate_schema(spec_path=spec_path, input_path=input_path)
     manifest = build_manifest(dataset)
-    write_dist(dist_path=dist_path, manifest=manifest, dataset=dataset)
+    write_dist(
+        dist_path=dist_path,
+        manifest=manifest,
+        dataset=dataset,
+        input_path=input_path,
+    )
 
     expected_by_id = _build_expected_assertions_by_id(
         dataset.get("assertions", [])
