@@ -6,6 +6,18 @@ Build pipeline and CLI for validating and compiling prosopographical datasets in
 
 psellos-builder treats **psellos-spec v0.1.0** as an immutable source of truth and produces derived artifacts only. It does not provide UI, visualization, or authoring features. Targets psellos-spec v0.1.0.
 
+## Installation
+
+```bash
+python -m pip install -e .
+```
+
+Example run (using demo dataset paths):
+
+```bash
+python -m psellos_builder.cli --spec ../psellos-spec/schema.json ../psellos-data/demo.json
+```
+
 ## Project context
 
 psellos-builder is one component in the broader psellos ecosystem, with coordination and planning tracked in `psellos-hub`.
