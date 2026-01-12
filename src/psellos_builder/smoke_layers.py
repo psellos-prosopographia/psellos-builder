@@ -56,8 +56,6 @@ def _validate_assertions_by_layer(path: Path) -> list[str]:
     raw = _load_json(path)
     if not isinstance(raw, dict):
         raise TypeError("assertions_by_layer.json must be a JSON object.")
-    if "canon" not in raw:
-        raise ValueError("assertions_by_layer.json must include the canon layer.")
 
     layers = list(raw.keys())
     _assert_sorted_list(layers, "Layer keys")

@@ -20,7 +20,7 @@ def build_assertions_by_layer(
     assertions: list[dict[str, Any]],
 ) -> dict[str, list[str]]:
     """Return assertion ids grouped by layer."""
-    assertions_by_layer: dict[str, set[str]] = {"canon": set()}
+    assertions_by_layer: dict[str, set[str]] = {}
     for assertion in assertions:
         assertion_id = assertion.get("id")
         if not isinstance(assertion_id, str):

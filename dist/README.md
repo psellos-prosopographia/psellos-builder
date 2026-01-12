@@ -31,8 +31,9 @@ Notes:
 - `assertions_by_id.json` is an adjacency index for O(1) lookup of assertions by id, reusing the
   same normalized assertion shape as `assertions.json`.
 - `assertions_by_layer.json` indexes assertion IDs by narrative layer, defaulting to `canon` when
-  the `extensions.psellos.layer` field is missing.
+  the `extensions.psellos.layer` field is missing for an assertion.
 - `assertions_by_person_by_layer.json` indexes assertion IDs by person and layer, combining subject
   and object endpoints, and defaulting to `canon` when the `extensions.psellos.layer` field is missing.
-- `layers.json` lists available narrative layers, derived from `assertions_by_layer.json` keys.
+- `layers.json` lists available narrative layers, derived from `assertions_by_layer.json` keys
+  (including `canon` only when present in assertions).
 - Adjacency indices are rebuilt on every run and are authoritative for downstream consumers.
