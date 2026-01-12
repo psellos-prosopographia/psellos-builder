@@ -17,3 +17,4 @@ Notes:
 - `persons.json` is an object keyed by person id containing the validated person objects
   from the input dataset (no enrichment).
 - `assertions.json` is the validated assertions array from the input dataset (no enrichment).
+- `assertions.json` uses flat endpoint IDs; person labels are resolved via persons.json.
