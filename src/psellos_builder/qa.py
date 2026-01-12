@@ -62,6 +62,23 @@ def _expected_layer_for_assertion(assertion: dict[str, Any]) -> str:
     return "canon"
 
 
+def _normalize_endpoint(value: Any) -> str:
+    if isinstance(value, str):
+        return value
+    if isinstance(value, dict) and "id" in value:
+        return str(value["id"])
+    raise ValueError(f"Unexpected assertion endpoint shape: {value!r}")
+
+
+def _normalize_assertion(assertion: dict[str, Any]) -> dict[str, Any]:
+    normalized = dict(assertion)
+    if "subject" in normalized:
+        normalized["subject"] = _normalize_endpoint(normalized["subject"])
+    if "object" in normalized:
+        normalized["object"] = _normalize_endpoint(normalized["object"])
+    return normalized
+
+
 def _build_expected_assertions_by_layer(
     assertions: list[dict[str, Any]],
 ) -> dict[str, list[str]]:
@@ -76,6 +93,19 @@ def _build_expected_assertions_by_layer(
         layer: sorted(assertions_by_layer[layer])
         for layer in sorted(assertions_by_layer)
     }
+
+
+def _build_expected_assertions_by_id(
+    assertions: list[dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    normalized = [_normalize_assertion(assertion) for assertion in assertions]
+    expected: dict[str, dict[str, Any]] = {}
+    for assertion in normalized:
+        assertion_id = assertion.get("id")
+        if not isinstance(assertion_id, str):
+            continue
+        expected[assertion_id] = assertion
+    return expected
 
 
 def _validate_assertions_by_layer(
@@ -123,13 +153,34 @@ def _validate_layers_json(layers_path: Path, expected_layers: list[str]) -> None
         raise ValueError("layers.json must match assertions_by_layer.json keys.")
 
 
+def _validate_assertions_by_id(
+    *, assertions_by_id_path: Path, expected: dict[str, dict[str, Any]]
+) -> None:
+    if not assertions_by_id_path.exists():
+        raise FileNotFoundError("assertions_by_id.json was not created.")
+    raw = _load_json(assertions_by_id_path)
+    if not isinstance(raw, dict):
+        raise TypeError("assertions_by_id.json must be a JSON object.")
+    keys = list(raw.keys())
+    _assert_sorted_list(keys, "assertions_by_id.json keys")
+    if raw != expected:
+        raise ValueError("assertions_by_id.json does not match expected assertions.")
+
+
 def run_check(*, input_path: Path, spec_path: Path, dist_path: Path) -> None:
     dataset = validate_schema(spec_path=spec_path, input_path=input_path)
     manifest = build_manifest(dataset)
     write_dist(dist_path=dist_path, manifest=manifest, dataset=dataset)
 
+    expected_by_id = _build_expected_assertions_by_id(
+        dataset.get("assertions", [])
+    )
     expected_by_layer = _build_expected_assertions_by_layer(
         dataset.get("assertions", [])
+    )
+    _validate_assertions_by_id(
+        assertions_by_id_path=dist_path / "assertions_by_id.json",
+        expected=expected_by_id,
     )
     assertions_by_layer_path = dist_path / "assertions_by_layer.json"
     layers = _validate_assertions_by_layer(

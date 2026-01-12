@@ -17,6 +17,9 @@ dist/
 Notes:
 
 - File names are stable to keep consumer integration simple.
+- Export flows can be implemented as client-side joins across these artifacts
+  (for example, using `layers.json`, `assertions_by_layer.json`, and
+  `assertions_by_id.json` together).
 - `manifest.json` includes `spec_version`, `counts`, and `person_index` (person id → name).
 - Manifest person index uses best-effort display name resolution (name/label/names/id).
 - `persons.json` is an object keyed by person id containing the validated person objects
