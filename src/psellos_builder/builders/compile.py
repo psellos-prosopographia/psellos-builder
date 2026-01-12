@@ -12,4 +12,4 @@ def compile_dataset(*, spec_path: Path, input_path: Path, dist_path: Path) -> No
     """Run the build pipeline for validation and dist output."""
     dataset = validate_schema(spec_path=spec_path, input_path=input_path)
     manifest = build_manifest(dataset)
-    write_dist(dist_path=dist_path, manifest=manifest)
+    write_dist(dist_path=dist_path, manifest=manifest, dataset=dataset)
