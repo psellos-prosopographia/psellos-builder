@@ -73,8 +73,8 @@ def _build_expected_assertions_by_layer(
         layer = _expected_layer_for_assertion(assertion)
         assertions_by_layer.setdefault(layer, set()).add(assertion_id)
     return {
-        layer: sorted(assertion_ids)
-        for layer, assertion_ids in assertions_by_layer.items()
+        layer: sorted(assertions_by_layer[layer])
+        for layer in sorted(assertions_by_layer)
     }
 
 
@@ -112,7 +112,7 @@ def _validate_assertions_by_layer(
 
 def _validate_layers_json(layers_path: Path, expected_layers: list[str]) -> None:
     if not layers_path.exists():
-        return
+        raise FileNotFoundError("layers.json was not created.")
     raw = _load_json(layers_path)
     if not isinstance(raw, list):
         raise TypeError("layers.json must be a JSON array.")
