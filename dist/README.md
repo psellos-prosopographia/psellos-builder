@@ -11,6 +11,7 @@ dist/
   assertions_by_id.json   # assertion id -> assertion object (verbatim)
   assertions_by_layer.json  # layer id -> assertion ids
   assertions_by_person_by_layer.json  # person id -> layer id -> assertion ids
+  layers.json             # layer ids (sorted)
 ```
 
 Notes:
@@ -30,4 +31,5 @@ Notes:
   the `extensions.psellos.layer` field is missing.
 - `assertions_by_person_by_layer.json` indexes assertion IDs by person and layer, combining subject
   and object endpoints, and defaulting to `canon` when the `extensions.psellos.layer` field is missing.
+- `layers.json` lists available narrative layers, derived from `assertions_by_layer.json` keys.
 - Adjacency indices are rebuilt on every run and are authoritative for downstream consumers.

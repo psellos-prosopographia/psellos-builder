@@ -14,6 +14,7 @@ dependencies = [
 
 [project.scripts]
 psellos-builder = "psellos_builder.cli:main"
+psellos-builder-qa = "psellos_builder.qa:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }

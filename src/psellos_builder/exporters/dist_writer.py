@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from psellos_builder.layers import build_layer_indexes
+
 
 def _normalize_endpoint(value: Any) -> str:
     if isinstance(value, str):
@@ -50,59 +52,6 @@ def _build_assertion_indexes(
     return sorted_by_person, assertions_by_id
 
 
-def _get_layer(assertion: dict[str, Any]) -> str:
-    extensions = assertion.get("extensions")
-    if isinstance(extensions, dict):
-        psellos = extensions.get("psellos")
-        if isinstance(psellos, dict):
-            layer = psellos.get("layer")
-            if isinstance(layer, str) and layer:
-                return layer
-    return "canon"
-
-
-def _add_to_person_layer_index(
-    index: dict[str, dict[str, set[str]]],
-    person_id: str,
-    layer: str,
-    assertion_id: str,
-) -> None:
-    index.setdefault(person_id, {}).setdefault(layer, set()).add(assertion_id)
-
-
-def _build_layer_indexes(
-    assertions: list[dict[str, Any]]
-) -> tuple[dict[str, list[str]], dict[str, dict[str, list[str]]]]:
-    assertions_by_layer: dict[str, set[str]] = {"canon": set()}
-    assertions_by_person_by_layer: dict[str, dict[str, set[str]]] = {}
-    for assertion in assertions:
-        assertion_id = assertion.get("id")
-        if not isinstance(assertion_id, str):
-            continue
-        layer = _get_layer(assertion)
-        assertions_by_layer.setdefault(layer, set()).add(assertion_id)
-        if "subject" in assertion:
-            _add_to_person_layer_index(
-                assertions_by_person_by_layer, assertion["subject"], layer, assertion_id
-            )
-        if "object" in assertion:
-            _add_to_person_layer_index(
-                assertions_by_person_by_layer, assertion["object"], layer, assertion_id
-            )
-    sorted_by_layer = {
-        layer: sorted(assertion_ids)
-        for layer, assertion_ids in assertions_by_layer.items()
-    }
-    sorted_by_person_by_layer = {
-        person_id: {
-            layer: sorted(assertion_ids)
-            for layer, assertion_ids in layers.items()
-        }
-        for person_id, layers in assertions_by_person_by_layer.items()
-    }
-    return sorted_by_layer, sorted_by_person_by_layer
-
-
 def write_dist(
     *, dist_path: Path, manifest: dict[str, Any], dataset: dict[str, Any]
 ) -> None:
@@ -136,7 +85,7 @@ def write_dist(
     assertions_by_person, assertions_by_id = _build_assertion_indexes(
         normalized_assertions
     )
-    assertions_by_layer, assertions_by_person_by_layer = _build_layer_indexes(
+    assertions_by_layer, assertions_by_person_by_layer = build_layer_indexes(
         normalized_assertions
     )
 
@@ -153,6 +102,11 @@ def write_dist(
     assertions_by_layer_path = dist_path / "assertions_by_layer.json"
     with assertions_by_layer_path.open("w", encoding="utf-8") as handle:
         json.dump(assertions_by_layer, handle, sort_keys=True, indent=2)
+        handle.write("\n")
+
+    layers_path = dist_path / "layers.json"
+    with layers_path.open("w", encoding="utf-8") as handle:
+        json.dump(sorted(assertions_by_layer.keys()), handle, indent=2)
         handle.write("\n")
 
     assertions_by_person_by_layer_path = (

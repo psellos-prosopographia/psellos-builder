@@ -63,6 +63,17 @@ python -m psellos_builder.cli --spec /path/to/psellos-spec/schema.json /path/to/
 
 The CLI validates the dataset against psellos-spec v0.1.0, resolving `https://psellos.org/spec/schema/*` references locally from the schema directory, and writes a deterministic manifest to `dist/`.
 
+## QA check
+
+Run the layer QA check against the fixture dataset (or any dataset):
+
+```bash
+python -m psellos_builder.qa --spec ../psellos-spec/schema.json ../psellos-data/fixture.json
+```
+
+The QA check runs the build pipeline and verifies `assertions_by_layer.json` (and, if present,
+`layers.json`) for deterministic sorting and correct layer assignment.
+
 ## Pipeline flow
 
 1. **Schema validation** ensures the raw dataset matches psellos-spec v0.1.0.
