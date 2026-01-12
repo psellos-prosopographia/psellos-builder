@@ -6,6 +6,23 @@ from pathlib import Path
 from typing import Any
 
 
+def _normalize_endpoint(value: Any) -> str:
+    if isinstance(value, str):
+        return value
+    if isinstance(value, dict) and "id" in value:
+        return str(value["id"])
+    raise ValueError(f"Unexpected assertion endpoint shape: {value!r}")
+
+
+def _normalize_assertion(assertion: dict[str, Any]) -> dict[str, Any]:
+    normalized = dict(assertion)
+    if "subject" in normalized:
+        normalized["subject"] = _normalize_endpoint(normalized["subject"])
+    if "object" in normalized:
+        normalized["object"] = _normalize_endpoint(normalized["object"])
+    return normalized
+
+
 def write_dist(
     *, dist_path: Path, manifest: dict[str, Any], dataset: dict[str, Any]
 ) -> None:
@@ -29,5 +46,9 @@ def write_dist(
 
     assertions_path = dist_path / "assertions.json"
     with assertions_path.open("w", encoding="utf-8") as handle:
-        json.dump(dataset.get("assertions", []), handle, sort_keys=True, indent=2)
+        assertions = dataset.get("assertions", [])
+        normalized_assertions = [
+            _normalize_assertion(assertion) for assertion in assertions
+        ]
+        json.dump(normalized_assertions, handle, sort_keys=True, indent=2)
         handle.write("\n")
