@@ -28,8 +28,8 @@ def build_assertions_by_layer(
         layer = get_layer(assertion)
         assertions_by_layer.setdefault(layer, set()).add(assertion_id)
     return {
-        layer: sorted(assertion_ids)
-        for layer, assertion_ids in assertions_by_layer.items()
+        layer: sorted(assertions_by_layer[layer])
+        for layer in sorted(assertions_by_layer)
     }
 
 

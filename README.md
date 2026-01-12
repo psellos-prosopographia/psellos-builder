@@ -71,8 +71,8 @@ Run the layer QA check against the fixture dataset (or any dataset):
 python -m psellos_builder.qa --spec ../psellos-spec/schema.json ../psellos-data/fixture.json
 ```
 
-The QA check runs the build pipeline and verifies `assertions_by_layer.json` (and, if present,
-`layers.json`) for deterministic sorting and correct layer assignment.
+The QA check runs the build pipeline and verifies `assertions_by_layer.json` and `layers.json`
+for deterministic sorting and correct layer assignment.
 
 ## Smoke test
 
