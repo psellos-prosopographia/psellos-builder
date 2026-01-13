@@ -48,6 +48,20 @@ def _resolve_build_timestamp() -> str:
     return DEFAULT_BUILD_TIMESTAMP
 
 
+def _derive_spec_version(spec_path: Path) -> str:
+    filename = spec_path.name
+    if not filename.endswith(".json"):
+        raise ValueError(
+            f"Spec path must end with .json to derive spec_version: {spec_path}"
+        )
+    spec_version = filename[: -len(".json")]
+    if not spec_version:
+        raise ValueError(
+            f"Spec path must include a filename before .json to derive spec_version: {spec_path}"
+        )
+    return spec_version
+
+
 def build_manifest(
     dataset: dict[str, Any], *, spec_path: Path, input_path: Path
 ) -> dict[str, Any]:
@@ -63,6 +77,8 @@ def build_manifest(
         person_index[person_id] = _resolve_person_display_name(person, person_id)
 
     manifest = {
+        "spec_version": _derive_spec_version(spec_path),
+        "generated_at": _resolve_build_timestamp(),
         "spec": {
             "identifier": spec_path.as_posix(),
             "version": SPEC_VERSION,
